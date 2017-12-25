@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -15,7 +16,8 @@ import static org.mockito.Mockito.*;
 
 public class ThreadPoolServiceTest {
 
-    private static final long STATISTICS_DELAY = 30L;
+    private static final long SHORT_DELAY = 30L;
+    private static final long STATISTICS_DELAY = SHORT_DELAY;
     private static final String ANY_THREAD_POOL_NAME = "ThreadPool";
     private static final String SECOND_ANY_THREAD_POOL_NAME = "SecondThreadPool";
 
@@ -149,6 +151,28 @@ public class ThreadPoolServiceTest {
         executorService.submit(task);
 
         verify(task, timeout(STATISTICS_DELAY).times(1)).run();
+    }
+
+    @Test
+    public void shouldCreateSingleScheduledExecutorService() {
+        threadPoolService = new ThreadPoolService();
+        Runnable task = mock(Runnable.class);
+
+        ScheduledExecutorService scheduledExecutorService = createFirstScheduledThreadPool();
+        scheduledExecutorService.schedule(task, SHORT_DELAY, TimeUnit.MILLISECONDS);
+
+        verify(task, timeout(3 * SHORT_DELAY).times(1)).run();
+    }
+
+    @Test
+    public void shouldCreateFixedScheduledExecutorService() {
+        threadPoolService = new ThreadPoolService();
+        Runnable task = mock(Runnable.class);
+
+        ScheduledExecutorService scheduledExecutorService = threadPoolService.newScheduledThreadPool(2, ANY_THREAD_POOL_NAME);
+        scheduledExecutorService.schedule(task, SHORT_DELAY, TimeUnit.MILLISECONDS);
+
+        verify(task, timeout(3 * SHORT_DELAY).times(1)).run();
     }
 
     private ScheduledExecutorService createFirstScheduledThreadPool() {
