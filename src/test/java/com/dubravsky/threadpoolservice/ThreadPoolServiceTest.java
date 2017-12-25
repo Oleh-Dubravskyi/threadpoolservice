@@ -1,0 +1,61 @@
+package com.dubravsky.threadpoolservice;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.function.Consumer;
+
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
+public class ThreadPoolServiceTest {
+
+    private static final long STATISTICS_DELAY = 30L;
+
+    private ThreadPoolService threadPoolService;
+
+    @After
+    public void shutdown() {
+        if (threadPoolService != null) {
+            threadPoolService.shutdown();
+        }
+    }
+
+    @Test
+    public void shouldCreateService() {
+        threadPoolService = new ThreadPoolService();
+        Assert.assertThat(threadPoolService, is(notNullValue()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotSetupStatisticsPrintingIfDelayIsNegative() {
+        threadPoolService = new ThreadPoolService();
+        threadPoolService.setupStatisticsPrinting(-1L, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotSetupStatisticsPrintingIfDelayIsZero() {
+        threadPoolService = new ThreadPoolService();
+        threadPoolService.setupStatisticsPrinting(0L, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotSetupStatisticsPrintingIfConsumerIsNull() {
+        threadPoolService = new ThreadPoolService();
+        threadPoolService.setupStatisticsPrinting(STATISTICS_DELAY, null);
+    }
+
+    @Test
+    public void shouldPrintStats() {
+        Consumer<String> statisticsConsumer = mock(Consumer.class);
+
+        threadPoolService = new ThreadPoolService();
+        threadPoolService.setupStatisticsPrinting(STATISTICS_DELAY, statisticsConsumer);
+
+        verify(statisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).accept(anyString());
+    }
+
+}
