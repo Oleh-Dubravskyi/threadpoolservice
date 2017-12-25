@@ -3,6 +3,7 @@ package com.dubravsky.threadpoolservice;
 import org.junit.After;
 import org.junit.Test;
 
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -74,6 +75,21 @@ public class ThreadPoolServiceTest {
 
         verify(secondStatisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).accept(anyString());
         assertThat(threadPoolService.getThreadPoolNumber(), is(1)); // it means the same thread pool is used for the new sconsumer
+    }
+
+    @Test
+    public void shouldShutdonwnNow() {
+        threadPoolService = new ThreadPoolService();
+        ScheduledExecutorService firstThreadPool = threadPoolService.newSingleScheduledThreadPool("FirstThreadPool");
+        ScheduledExecutorService secondThreadPool = threadPoolService.newSingleScheduledThreadPool("SecondThreadPool");
+
+        assertThat(firstThreadPool.isShutdown(), is(false));
+        assertThat(secondThreadPool.isShutdown(), is(false));
+
+        threadPoolService.shutdownNow();
+
+        assertThat(firstThreadPool.isShutdown(), is(true));
+        assertThat(secondThreadPool.isShutdown(), is(true));
     }
 
 }
