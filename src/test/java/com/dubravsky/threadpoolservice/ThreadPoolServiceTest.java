@@ -83,6 +83,9 @@ public class ThreadPoolServiceTest {
         ScheduledExecutorService firstThreadPool = threadPoolService.newSingleScheduledThreadPool("FirstThreadPool");
         ScheduledExecutorService secondThreadPool = threadPoolService.newSingleScheduledThreadPool("SecondThreadPool");
 
+        assertThat(firstThreadPool.isShutdown(), is(false));
+        assertThat(secondThreadPool.isShutdown(), is(false));
+
         threadPoolService.shutdownNow();
 
         assertThat(firstThreadPool.isShutdown(), is(true));
