@@ -17,6 +17,7 @@ public class ThreadPoolServiceTest {
 
     private static final long STATISTICS_DELAY = 30L;
     private static final String ANY_THREAD_POOL_NAME = "ThreadPool";
+    private static final String SECOND_ANY_THREAD_POOL_NAME = "SecondThreadPool";
 
     private ThreadPoolService threadPoolService;
 
@@ -82,8 +83,8 @@ public class ThreadPoolServiceTest {
     @Test
     public void shouldShutdonwnNow() {
         threadPoolService = new ThreadPoolService();
-        ScheduledExecutorService firstThreadPool = threadPoolService.newSingleScheduledThreadPool("FirstThreadPool");
-        ScheduledExecutorService secondThreadPool = threadPoolService.newSingleScheduledThreadPool("SecondThreadPool");
+        ScheduledExecutorService firstThreadPool = createFirstScheduledThreadPool();
+        ScheduledExecutorService secondThreadPool = createSecondScheduledThreadPool();
 
         assertThat(firstThreadPool.isShutdown(), is(false));
         assertThat(secondThreadPool.isShutdown(), is(false));
@@ -97,8 +98,8 @@ public class ThreadPoolServiceTest {
     @Test
     public void shouldCheckIsShutdownCorrectly() {
         threadPoolService = new ThreadPoolService();
-        ScheduledExecutorService firstThreadPool = threadPoolService.newSingleScheduledThreadPool("FirstThreadPool");
-        ScheduledExecutorService secondThreadPool = threadPoolService.newSingleScheduledThreadPool("SecondThreadPool");
+        ScheduledExecutorService firstThreadPool = createFirstScheduledThreadPool();
+        ScheduledExecutorService secondThreadPool = createSecondScheduledThreadPool();
 
         assertThat(firstThreadPool.isShutdown(), is(false));
         assertThat(secondThreadPool.isShutdown(), is(false));
@@ -114,8 +115,8 @@ public class ThreadPoolServiceTest {
     @Test
     public void shouldCheckIsTerminatedCorrectly() {
         threadPoolService = new ThreadPoolService();
-        ScheduledExecutorService firstThreadPool = threadPoolService.newSingleScheduledThreadPool("FirstThreadPool");
-        ScheduledExecutorService secondThreadPool = threadPoolService.newSingleScheduledThreadPool("SecondThreadPool");
+        ScheduledExecutorService firstThreadPool = createFirstScheduledThreadPool();
+        ScheduledExecutorService secondThreadPool = createSecondScheduledThreadPool();
 
         assertThat(firstThreadPool.isTerminated(), is(false));
         assertThat(secondThreadPool.isTerminated(), is(false));
@@ -148,6 +149,14 @@ public class ThreadPoolServiceTest {
         executorService.submit(task);
 
         verify(task, timeout(STATISTICS_DELAY).times(1)).run();
+    }
+
+    private ScheduledExecutorService createFirstScheduledThreadPool() {
+        return threadPoolService.newSingleScheduledThreadPool(ANY_THREAD_POOL_NAME);
+    }
+
+    private ScheduledExecutorService createSecondScheduledThreadPool() {
+        return threadPoolService.newSingleScheduledThreadPool(SECOND_ANY_THREAD_POOL_NAME);
     }
 
 }
