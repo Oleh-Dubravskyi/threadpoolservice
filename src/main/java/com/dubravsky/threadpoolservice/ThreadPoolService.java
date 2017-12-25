@@ -62,6 +62,15 @@ public class ThreadPoolService {
         return tasks;
     }
 
+    public boolean isShutdown() {
+        for (ExecutorService executorService : executorServices) {
+            if (!executorService.isShutdown()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void add(ExecutorService executorService) {
         executorServices.add(executorService);
     }

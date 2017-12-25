@@ -92,4 +92,21 @@ public class ThreadPoolServiceTest {
         assertThat(secondThreadPool.isShutdown(), is(true));
     }
 
+    @Test
+    public void shouldCheckIsShutdownCorrectly() {
+        threadPoolService = new ThreadPoolService();
+        ScheduledExecutorService firstThreadPool = threadPoolService.newSingleScheduledThreadPool("FirstThreadPool");
+        ScheduledExecutorService secondThreadPool = threadPoolService.newSingleScheduledThreadPool("SecondThreadPool");
+
+        assertThat(firstThreadPool.isShutdown(), is(false));
+        assertThat(secondThreadPool.isShutdown(), is(false));
+        assertThat(threadPoolService.isShutdown(), is(false));
+
+        threadPoolService.shutdownNow();
+
+        assertThat(firstThreadPool.isShutdown(), is(true));
+        assertThat(secondThreadPool.isShutdown(), is(true));
+        assertThat(threadPoolService.isShutdown(), is(true));
+    }
+
 }
