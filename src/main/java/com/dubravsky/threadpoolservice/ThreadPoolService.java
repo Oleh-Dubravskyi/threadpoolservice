@@ -54,6 +54,14 @@ public class ThreadPoolService {
         }
     }
 
+    public List<Runnable> shutdownNow() {
+        List<Runnable> tasks = new ArrayList<>();
+        for (ExecutorService executorService : executorServices) {
+            tasks.addAll(executorService.shutdownNow());
+        }
+        return tasks;
+    }
+
     private void add(ExecutorService executorService) {
         executorServices.add(executorService);
     }
