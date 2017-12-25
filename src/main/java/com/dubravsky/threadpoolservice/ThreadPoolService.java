@@ -71,6 +71,15 @@ public class ThreadPoolService {
         return true;
     }
 
+    public boolean isTerminated() {
+        for (ExecutorService executorService : executorServices) {
+            if (!executorService.isTerminated()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void add(ExecutorService executorService) {
         executorServices.add(executorService);
     }
