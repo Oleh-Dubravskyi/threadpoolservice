@@ -10,6 +10,7 @@ public class ThreadPoolService {
     private final List<ExecutorService> executorServices = new ArrayList<>();
     private Consumer<String> statisticsConsumer;
     private ScheduledExecutorService serviceThreadPool;
+    private ScheduledFuture<?> printStatisticsFeature;
 
     public void setupStatisticsPrinting(Long delayMillis, Consumer<String> statisticsConsumer) {
         if (delayMillis <= 0) {
@@ -21,9 +22,19 @@ public class ThreadPoolService {
 
         this.statisticsConsumer = statisticsConsumer;
 
-        serviceThreadPool = newSingleScheduledThreadPool("ThreadPoolService");
-        serviceThreadPool.scheduleAtFixedRate(this::printStatistics, delayMillis,
+        if (serviceThreadPool == null) {
+            serviceThreadPool = newSingleScheduledThreadPool("ThreadPoolService");
+        }
+
+        if (printStatisticsFeature != null) {
+            printStatisticsFeature.cancel(false);
+        }
+        printStatisticsFeature = serviceThreadPool.scheduleAtFixedRate(this::printStatistics, delayMillis,
                 delayMillis, TimeUnit.MILLISECONDS);
+    }
+
+    public int getThreadPoolNumber() {
+        return executorServices.size();
     }
 
     public ScheduledExecutorService newSingleScheduledThreadPool(String threadName) {

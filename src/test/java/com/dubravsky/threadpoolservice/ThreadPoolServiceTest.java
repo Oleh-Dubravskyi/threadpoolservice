@@ -1,13 +1,13 @@
 package com.dubravsky.threadpoolservice;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -27,7 +27,7 @@ public class ThreadPoolServiceTest {
     @Test
     public void shouldCreateService() {
         threadPoolService = new ThreadPoolService();
-        Assert.assertThat(threadPoolService, is(notNullValue()));
+        assertThat(threadPoolService, is(notNullValue()));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -56,6 +56,24 @@ public class ThreadPoolServiceTest {
         threadPoolService.setupStatisticsPrinting(STATISTICS_DELAY, statisticsConsumer);
 
         verify(statisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).accept(anyString());
+    }
+
+    @Test
+    public void shouldReassingPrintingConsumer() {
+        Consumer<String> firstStatisticsConsumer = mock(Consumer.class);
+        Consumer<String> secondStatisticsConsumer = mock(Consumer.class);
+
+        threadPoolService = new ThreadPoolService();
+        threadPoolService.setupStatisticsPrinting(STATISTICS_DELAY, firstStatisticsConsumer);
+
+        verify(firstStatisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).accept(anyString());
+        assertThat(threadPoolService.getThreadPoolNumber(), is(1));
+
+        // reassign statistics consumer
+        threadPoolService.setupStatisticsPrinting(STATISTICS_DELAY, secondStatisticsConsumer);
+
+        verify(secondStatisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).accept(anyString());
+        assertThat(threadPoolService.getThreadPoolNumber(), is(1)); // it means the same thread pool is used for the new sconsumer
     }
 
 }
