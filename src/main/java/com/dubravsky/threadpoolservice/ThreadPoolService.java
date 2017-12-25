@@ -37,6 +37,17 @@ public class ThreadPoolService {
         return executorServices.size();
     }
 
+    public ExecutorService newSingleThreadScheduledExecutor(String threadName) {
+        return newFixedThreadPool(1, threadName);
+    }
+
+    public ExecutorService newFixedThreadPool(int nThreads, String threadName) {
+        ThreadFactory threadFactory = new NamedThreadFactory(threadName);
+        ExecutorService executorService = Executors.newFixedThreadPool(nThreads, threadFactory);
+        add(executorService);
+        return executorService;
+    }
+
     public ScheduledExecutorService newSingleScheduledThreadPool(String threadName) {
         return newScheduledThreadPool(1, threadName);
     }

@@ -3,6 +3,7 @@ package com.dubravsky.threadpoolservice;
 import org.junit.After;
 import org.junit.Test;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.*;
 public class ThreadPoolServiceTest {
 
     private static final long STATISTICS_DELAY = 30L;
+    private static final String ANY_THREAD_POOL_NAME = "ThreadPool";
 
     private ThreadPoolService threadPoolService;
 
@@ -124,6 +126,28 @@ public class ThreadPoolServiceTest {
         assertThat(firstThreadPool.isTerminated(), is(true));
         assertThat(secondThreadPool.isTerminated(), is(true));
         assertThat(threadPoolService.isTerminated(), is(true));
+    }
+
+    @Test
+    public void shouldCreateSingleExecutorService() {
+        threadPoolService = new ThreadPoolService();
+        Runnable task = mock(Runnable.class);
+
+        ExecutorService executorService = threadPoolService.newSingleThreadScheduledExecutor(ANY_THREAD_POOL_NAME);
+        executorService.submit(task);
+
+        verify(task, timeout(STATISTICS_DELAY).times(1)).run();
+    }
+
+    @Test
+    public void shouldCreateFixedExecutorService() {
+        threadPoolService = new ThreadPoolService();
+        Runnable task = mock(Runnable.class);
+
+        ExecutorService executorService = threadPoolService.newFixedThreadPool(2, ANY_THREAD_POOL_NAME);
+        executorService.submit(task);
+
+        verify(task, timeout(STATISTICS_DELAY).times(1)).run();
     }
 
 }
