@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 public class ThreadPoolServiceTest {
 
     static final long SHORT_DELAY = 30L;
+    static final long DELAY = 3 * SHORT_DELAY;
     static final String ANY_THREAD_POOL_NAME = "TestThreadPool";
     static final IllegalArgumentException ANY_EXCEPTION = new IllegalArgumentException("Message");
     private static final long STATISTICS_DELAY = SHORT_DELAY;
@@ -33,59 +34,47 @@ public class ThreadPoolServiceTest {
 
     @Test
     public void shouldCreateService() {
-        threadPoolService = new ThreadPoolService();
+        threadPoolService = ThreadPoolService.create();
         assertThat(threadPoolService, is(notNullValue()));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldNotSetupStatisticsPrintingIfDelayIsNegative() {
-        threadPoolService = new ThreadPoolService();
-        threadPoolService.setupStatisticsPrinting(-1L, null);
+    public void shouldThrowExceptionIfStatisticsOutputDelayIsNegative() {
+        threadPoolService = ThreadPoolService.builder()
+                .statisticsOutputDelay(-1L)
+                .build();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldNotSetupStatisticsPrintingIfDelayIsZero() {
-        threadPoolService = new ThreadPoolService();
-        threadPoolService.setupStatisticsPrinting(0L, null);
+    public void shouldThrowExceptionIfStatisticsOutputDelayIsZero() {
+        threadPoolService = ThreadPoolService.builder()
+                .statisticsOutputDelay(0L)
+                .build();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldNotSetupStatisticsPrintingIfConsumerIsNull() {
-        threadPoolService = new ThreadPoolService();
-        threadPoolService.setupStatisticsPrinting(STATISTICS_DELAY, null);
+    public void shouldThrowExceptionIfConsumerIsNull() {
+        threadPoolService = ThreadPoolService.builder()
+                .statisticsOutputDelay(STATISTICS_DELAY)
+                .statisticsHandler(null)
+                .build();
     }
 
     @Test
     public void shouldPrintStats() {
         Consumer<String> statisticsConsumer = mock(Consumer.class);
 
-        threadPoolService = new ThreadPoolService();
-        threadPoolService.setupStatisticsPrinting(STATISTICS_DELAY, statisticsConsumer);
+        threadPoolService = ThreadPoolService.builder()
+                .statisticsHandler(statisticsConsumer)
+                .statisticsOutputDelay(STATISTICS_DELAY)
+                .build();
 
         verify(statisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).accept(anyString());
     }
 
     @Test
-    public void shouldReassingPrintingConsumer() {
-        Consumer<String> firstStatisticsConsumer = mock(Consumer.class);
-        Consumer<String> secondStatisticsConsumer = mock(Consumer.class);
-
-        threadPoolService = new ThreadPoolService();
-        threadPoolService.setupStatisticsPrinting(STATISTICS_DELAY, firstStatisticsConsumer);
-
-        verify(firstStatisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).accept(anyString());
-        assertThat(threadPoolService.getThreadPoolNumber(), is(1));
-
-        // reassign statistics consumer
-        threadPoolService.setupStatisticsPrinting(STATISTICS_DELAY, secondStatisticsConsumer);
-
-        verify(secondStatisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).accept(anyString());
-        assertThat(threadPoolService.getThreadPoolNumber(), is(1)); // it means the same thread pool is used for the new sconsumer
-    }
-
-    @Test
     public void shouldShutdonwnNow() {
-        threadPoolService = new ThreadPoolService();
+        threadPoolService = ThreadPoolService.create();
         ScheduledExecutorService firstThreadPool = createFirstScheduledThreadPool();
         ScheduledExecutorService secondThreadPool = createSecondScheduledThreadPool();
 
@@ -100,7 +89,7 @@ public class ThreadPoolServiceTest {
 
     @Test
     public void shouldCheckIsShutdownCorrectly() {
-        threadPoolService = new ThreadPoolService();
+        threadPoolService = ThreadPoolService.create();
         ScheduledExecutorService firstThreadPool = createFirstScheduledThreadPool();
         ScheduledExecutorService secondThreadPool = createSecondScheduledThreadPool();
 
@@ -117,7 +106,7 @@ public class ThreadPoolServiceTest {
 
     @Test
     public void shouldCheckIsTerminatedCorrectly() {
-        threadPoolService = new ThreadPoolService();
+        threadPoolService = ThreadPoolService.create();
         ScheduledExecutorService firstThreadPool = createFirstScheduledThreadPool();
         ScheduledExecutorService secondThreadPool = createSecondScheduledThreadPool();
 
@@ -134,46 +123,46 @@ public class ThreadPoolServiceTest {
 
     @Test
     public void shouldCreateSingleExecutorService() {
-        threadPoolService = new ThreadPoolService();
+        threadPoolService = ThreadPoolService.create();
         Runnable task = mock(Runnable.class);
 
         ExecutorService executorService = threadPoolService.newSingleThreadExecutor(ANY_THREAD_POOL_NAME);
         executorService.submit(task);
 
-        verify(task, timeout(STATISTICS_DELAY).times(1)).run();
+        verify(task, timeout(DELAY).times(1)).run();
     }
 
     @Test
     public void shouldCreateFixedExecutorService() {
-        threadPoolService = new ThreadPoolService();
+        threadPoolService = ThreadPoolService.create();
         Runnable task = mock(Runnable.class);
 
         ExecutorService executorService = threadPoolService.newFixedThreadPool(2, ANY_THREAD_POOL_NAME);
         executorService.submit(task);
 
-        verify(task, timeout(STATISTICS_DELAY).times(1)).run();
+        verify(task, timeout(DELAY).times(1)).run();
     }
 
     @Test
     public void shouldCreateSingleScheduledExecutorService() {
-        threadPoolService = new ThreadPoolService();
+        threadPoolService = ThreadPoolService.create();
         Runnable task = mock(Runnable.class);
 
         ScheduledExecutorService scheduledExecutorService = createFirstScheduledThreadPool();
         scheduledExecutorService.schedule(task, SHORT_DELAY, TimeUnit.MILLISECONDS);
 
-        verify(task, timeout(3 * SHORT_DELAY).times(1)).run();
+        verify(task, timeout(DELAY).times(1)).run();
     }
 
     @Test
     public void shouldCreateFixedScheduledExecutorService() {
-        threadPoolService = new ThreadPoolService();
+        threadPoolService = ThreadPoolService.create();
         Runnable task = mock(Runnable.class);
 
         ScheduledExecutorService scheduledExecutorService = threadPoolService.newScheduledThreadPool(2, ANY_THREAD_POOL_NAME);
         scheduledExecutorService.schedule(task, SHORT_DELAY, TimeUnit.MILLISECONDS);
 
-        verify(task, timeout(3 * SHORT_DELAY).times(1)).run();
+        verify(task, timeout(DELAY).times(1)).run();
     }
 
     private ScheduledExecutorService createFirstScheduledThreadPool() {

@@ -2,40 +2,41 @@ package com.dubravsky.threadpoolservice;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class ThreadPoolService {
 
     private final List<ExecutorService> executorServices = new ArrayList<>();
-    private Consumer<String> statisticsConsumer;
-    private Consumer<Exception> exceptionHandler;
-    private ScheduledExecutorService serviceThreadPool;
-    private ScheduledFuture<?> printStatisticsFeature;
+    private final Consumer<Exception> exceptionHandler;
+    private final Consumer<String> statisticsHandler;
+    private final ScheduledExecutorService serviceThreadPool;
 
-    public void setupStatisticsPrinting(Long delayMillis, Consumer<String> statisticsConsumer) {
-        if (delayMillis <= 0) {
-            throw new IllegalArgumentException("To print thread pool statistics delay should be positive but it is " + delayMillis);
-        }
-        if (statisticsConsumer == null) {
-            throw new IllegalArgumentException("To print thread pool statistics consumer should be not null");
-        }
-
-        this.statisticsConsumer = statisticsConsumer;
-
-        if (serviceThreadPool == null) {
-            serviceThreadPool = newSingleScheduledThreadPool("ServicePool");
-        }
-
-        if (printStatisticsFeature != null) {
-            printStatisticsFeature.cancel(false);
-        }
-        printStatisticsFeature = serviceThreadPool.scheduleAtFixedRate(this::printStatistics, delayMillis,
-                delayMillis, TimeUnit.MILLISECONDS);
+    public static ThreadPoolService create() {
+        return builder().build();
     }
 
-    public void setExceptionHandler(Consumer<Exception> exceptionHandler) {
+    public static ThreadPoolServiceBuilder builder() {
+        return new ThreadPoolServiceBuilder();
+    }
+
+    ThreadPoolService(Consumer<Exception> exceptionHandler, Consumer<String> statisticsHandler, long statisticsOutputDelay) {
         this.exceptionHandler = exceptionHandler;
+        this.statisticsHandler = statisticsHandler;
+        this.serviceThreadPool = startStatisticsPrinting(statisticsOutputDelay);
+    }
+
+    private ScheduledExecutorService startStatisticsPrinting(Long delayMillis) {
+        if (delayMillis <= 0 || statisticsHandler == null) {
+            return null;
+        }
+
+        ScheduledExecutorService result = newSingleScheduledThreadPool("ServicePool");
+        result.scheduleAtFixedRate(this::printStatistics, delayMillis, delayMillis, TimeUnit.MILLISECONDS);
+        return result;
     }
 
     public int getThreadPoolNumber() {
@@ -112,7 +113,7 @@ public class ThreadPoolService {
                 threadPoolExecutor.getActiveCount(),
                 threadPoolExecutor.getQueue().size(),
                 threadPoolExecutor.getCompletedTaskCount());
-        statisticsConsumer.accept(message);
+        statisticsHandler.accept(message);
     }
 
 }
