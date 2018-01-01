@@ -31,7 +31,7 @@ public class ThreadPoolServiceBuilder {
 
     public ThreadPoolServiceBuilder statisticsOutputDelay(long statisticsOutputDelay) {
         if (statisticsOutputDelay <= 0) {
-            throw new IllegalArgumentException("To print thread pool statistics delay should be positive but it is " + statisticsOutputDelay);
+            throw new IllegalArgumentException("Statistics delay should be positive but it is " + statisticsOutputDelay);
         }
         this.statisticsOutputDelay = statisticsOutputDelay;
         return this;
