@@ -1,5 +1,7 @@
 package com.dubravsky.threadpoolservice;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.Callable;
@@ -14,65 +16,63 @@ import static org.mockito.Mockito.*;
 public class ExceptionHandlerTest {
 
     private ThreadPoolService threadPoolService;
+    private Consumer<Exception> exceptionHandler;
+    private ExecutorService executorService;
+    private ScheduledExecutorService scheduledExecutorService;
+
+    @Before
+    public void init() {
+        exceptionHandler = mock(Consumer.class);
+        threadPoolService = ThreadPoolService.builder()
+                .exceptionHandler(exceptionHandler)
+                .build();
+        executorService = threadPoolService.newSingleThreadExecutor(ANY_THREAD_POOL_NAME);
+        scheduledExecutorService = threadPoolService.newSingleScheduledThreadPool(ANY_THREAD_POOL_NAME);
+    }
+
+    @After
+    public void shutdown() {
+        threadPoolService.shutdown();
+    }
 
     @Test
     public void executorServiceShouldCatchExceptionInCallable() {
-        Consumer<Exception> exceptionHandler = mock(Consumer.class);
-        threadPoolService = new ThreadPoolService();
-        threadPoolService.setExceptionHandler(exceptionHandler);
-
-        ExecutorService executorService = threadPoolService.newSingleThreadExecutor(ANY_THREAD_POOL_NAME);
         Callable<String> task = () -> {
             throw ANY_EXCEPTION;
         };
         executorService.submit(task);
 
-        verify(exceptionHandler, timeout(3 * SHORT_DELAY).times(1)).accept(ANY_EXCEPTION);
+        verify(exceptionHandler, timeout(DELAY).times(1)).accept(ANY_EXCEPTION);
     }
 
     @Test
     public void executorServiceShouldCatchExceptionInRunnable() {
-        Consumer<Exception> exceptionHandler = mock(Consumer.class);
-        threadPoolService = new ThreadPoolService();
-        threadPoolService.setExceptionHandler(exceptionHandler);
-
-        ExecutorService executorService = threadPoolService.newSingleThreadExecutor(ANY_THREAD_POOL_NAME);
         Runnable task = () -> {
             throw ANY_EXCEPTION;
         };
         executorService.submit(task);
 
-        verify(exceptionHandler, timeout(3 * SHORT_DELAY).times(1)).accept(ANY_EXCEPTION);
+        verify(exceptionHandler, timeout(DELAY).times(1)).accept(ANY_EXCEPTION);
     }
 
     @Test
     public void scheduledExecutorServiceShouldCatchExceptionInCallable() {
-        Consumer<Exception> exceptionHandler = mock(Consumer.class);
-        threadPoolService = new ThreadPoolService();
-        threadPoolService.setExceptionHandler(exceptionHandler);
-
-        ScheduledExecutorService executorService = threadPoolService.newSingleScheduledThreadPool(ANY_THREAD_POOL_NAME);
         Callable<String> task = () -> {
             throw ANY_EXCEPTION;
         };
-        executorService.schedule(task, SHORT_DELAY, TimeUnit.MILLISECONDS);
+        scheduledExecutorService.schedule(task, SHORT_DELAY, TimeUnit.MILLISECONDS);
 
-        verify(exceptionHandler, timeout(3 * SHORT_DELAY).times(1)).accept(ANY_EXCEPTION);
+        verify(exceptionHandler, timeout(DELAY).times(1)).accept(ANY_EXCEPTION);
     }
 
     @Test
     public void scheduledExecutorServiceShouldCatchExceptionInRunnable() {
-        Consumer<Exception> exceptionHandler = mock(Consumer.class);
-        threadPoolService = new ThreadPoolService();
-        threadPoolService.setExceptionHandler(exceptionHandler);
-
-        ScheduledExecutorService executorService = threadPoolService.newSingleScheduledThreadPool(ANY_THREAD_POOL_NAME);
         Runnable task = () -> {
             throw ANY_EXCEPTION;
         };
-        executorService.schedule(task, SHORT_DELAY, TimeUnit.MILLISECONDS);
+        scheduledExecutorService.schedule(task, SHORT_DELAY, TimeUnit.MILLISECONDS);
 
-        verify(exceptionHandler, timeout(3 * SHORT_DELAY).times(1)).accept(ANY_EXCEPTION);
+        verify(exceptionHandler, timeout(DELAY).times(1)).accept(ANY_EXCEPTION);
     }
 
 }
