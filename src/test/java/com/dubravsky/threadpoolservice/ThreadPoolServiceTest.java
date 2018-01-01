@@ -19,9 +19,9 @@ public class ThreadPoolServiceTest {
     static final long SHORT_DELAY = 30L;
     static final long DELAY = 3 * SHORT_DELAY;
     static final String ANY_THREAD_POOL_NAME = "TestThreadPool";
+    static final String SECOND_ANY_THREAD_POOL_NAME = "SecondTestThreadPool";
     static final IllegalArgumentException ANY_EXCEPTION = new IllegalArgumentException("Message");
     private static final long STATISTICS_DELAY = SHORT_DELAY;
-    private static final String SECOND_ANY_THREAD_POOL_NAME = "SecondTestThreadPool";
 
     private ThreadPoolService threadPoolService;
 
@@ -58,6 +58,14 @@ public class ThreadPoolServiceTest {
                 .statisticsOutputDelay(STATISTICS_DELAY)
                 .statisticsHandler(null)
                 .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionIfThreadPoolNameIsNotUnique() {
+        threadPoolService = ThreadPoolService.create();
+
+        threadPoolService.newSingleThreadExecutor(ANY_THREAD_POOL_NAME);
+        threadPoolService.newSingleThreadExecutor(ANY_THREAD_POOL_NAME);
     }
 
     @Test

@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class ThreadPoolService {
 
-    private final List<ExecutorService> executorServices = new ArrayList<>();
+    private final List<NamedThreadPoolExecutor> executorServices = new ArrayList<>();
     private final Consumer<Exception> exceptionHandler;
     private final Consumer<String> statisticsHandler;
     private final ScheduledExecutorService serviceThreadPool;
@@ -97,8 +97,16 @@ public class ThreadPoolService {
         return true;
     }
 
-    private void add(ExecutorService executorService) {
+    private void add(NamedThreadPoolExecutor executorService) {
+        if (!uniqueName(executorService.getName())) {
+            throw new IllegalArgumentException("Not unique thread pool name: " + executorService.getName());
+        }
         executorServices.add(executorService);
+    }
+
+    private boolean uniqueName(String name) {
+        return executorServices.stream()
+                .noneMatch(namedThreadPoolExecutor -> namedThreadPoolExecutor.getName().equals(name));
     }
 
     private void printStatistics() {
