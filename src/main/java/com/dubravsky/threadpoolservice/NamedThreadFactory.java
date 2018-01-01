@@ -8,7 +8,11 @@ class NamedThreadFactory implements ThreadFactory {
     private final AtomicLong threadIndex = new AtomicLong(0);
     private final String threadName;
 
-    NamedThreadFactory(String threadName) {
+    static ThreadFactory of(String threadName) {
+        return new NamedThreadFactory(threadName);
+    }
+
+    private NamedThreadFactory(String threadName) {
         this.threadName = threadName;
     }
 

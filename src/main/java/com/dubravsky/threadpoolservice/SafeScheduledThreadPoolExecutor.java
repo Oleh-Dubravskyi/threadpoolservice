@@ -6,12 +6,19 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
-public class SafeScheduledThreadPoolExecutor extends ScheduledThreadPoolExecutor {
+public class SafeScheduledThreadPoolExecutor extends ScheduledThreadPoolExecutor implements NamedThreadPoolExecutor{
 
+    private final String name;
     private Consumer<Exception> exceptionHandler;
 
-    public SafeScheduledThreadPoolExecutor(int corePoolSize, ThreadFactory threadFactory) {
-        super(corePoolSize, threadFactory);
+    public SafeScheduledThreadPoolExecutor(int corePoolSize, String threadName) {
+        super(corePoolSize, NamedThreadFactory.of(threadName));
+        this.name = threadName;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     public void setExceptionHandler(Consumer<Exception> exceptionHandler) {

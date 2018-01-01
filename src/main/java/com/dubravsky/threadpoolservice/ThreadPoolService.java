@@ -24,7 +24,7 @@ public class ThreadPoolService {
         this.statisticsConsumer = statisticsConsumer;
 
         if (serviceThreadPool == null) {
-            serviceThreadPool = newSingleScheduledThreadPool("ThreadPoolService");
+            serviceThreadPool = newSingleScheduledThreadPool("ServicePool");
         }
 
         if (printStatisticsFeature != null) {
@@ -47,8 +47,7 @@ public class ThreadPoolService {
     }
 
     public ExecutorService newFixedThreadPool(int nThreads, String threadName) {
-        ThreadFactory threadFactory = new NamedThreadFactory(threadName);
-        SafeThreadPoolExecutor executorService = new SafeThreadPoolExecutor(nThreads, threadFactory);
+        SafeThreadPoolExecutor executorService = new SafeThreadPoolExecutor(nThreads, threadName);
         executorService.setExceptionHandler(exceptionHandler);
         add(executorService);
         return executorService;
@@ -59,8 +58,7 @@ public class ThreadPoolService {
     }
 
     public ScheduledExecutorService newScheduledThreadPool(int corePoolSize, String threadName) {
-        ThreadFactory threadFactory = new NamedThreadFactory(threadName);
-        SafeScheduledThreadPoolExecutor scheduledExecutorService = new SafeScheduledThreadPoolExecutor(corePoolSize, threadFactory);
+        SafeScheduledThreadPoolExecutor scheduledExecutorService = new SafeScheduledThreadPoolExecutor(corePoolSize, threadName);
         scheduledExecutorService.setExceptionHandler(exceptionHandler);
         add(scheduledExecutorService);
         return scheduledExecutorService;
