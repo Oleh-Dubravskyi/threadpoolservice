@@ -1,5 +1,9 @@
 package com.dubravsky.threadpoolservice;
 
+import com.dubravsky.threadpoolservice.task.SafeCallable;
+import com.dubravsky.threadpoolservice.task.SafeRunnable;
+import com.dubravsky.threadpoolservice.util.NamedThreadFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

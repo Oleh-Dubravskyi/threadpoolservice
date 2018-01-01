@@ -1,14 +1,14 @@
-package com.dubravsky.threadpoolservice;
+package com.dubravsky.threadpoolservice.util;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
-class NamedThreadFactory implements ThreadFactory {
+public class NamedThreadFactory implements ThreadFactory {
 
     private final AtomicLong threadIndex = new AtomicLong(0);
     private final String threadName;
 
-    static ThreadFactory of(String threadName) {
+    public static ThreadFactory of(String threadName) {
         return new NamedThreadFactory(threadName);
     }
 

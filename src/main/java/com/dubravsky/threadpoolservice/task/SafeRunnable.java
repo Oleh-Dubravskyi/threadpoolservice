@@ -1,8 +1,8 @@
-package com.dubravsky.threadpoolservice;
+package com.dubravsky.threadpoolservice.task;
 
 import java.util.function.Consumer;
 
-class SafeRunnable implements Runnable {
+public class SafeRunnable implements Runnable {
 
     private final Runnable task;
     private final Consumer<Exception> exceptionHandler;
