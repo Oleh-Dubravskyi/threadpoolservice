@@ -70,14 +70,14 @@ public class ThreadPoolServiceTest {
 
     @Test
     public void shouldPrintStats() {
-        Consumer<String> statisticsConsumer = mock(Consumer.class);
+        StatisticsHandler statisticsConsumer = mock(StatisticsHandler.class);
 
         threadPoolService = ThreadPoolService.builder()
                 .statisticsHandler(statisticsConsumer)
                 .statisticsOutputDelay(STATISTICS_DELAY)
                 .build();
 
-        verify(statisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).accept(anyString());
+        verify(statisticsConsumer, timeout(3 * STATISTICS_DELAY).atLeastOnce()).handle(any(), anyString());
     }
 
     @Test

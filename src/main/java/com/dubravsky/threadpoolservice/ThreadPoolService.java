@@ -12,7 +12,7 @@ public class ThreadPoolService {
 
     private final List<NamedThreadPoolExecutor> executorServices = new ArrayList<>();
     private final Consumer<Exception> exceptionHandler;
-    private final Consumer<String> statisticsHandler;
+    private final StatisticsHandler statisticsHandler;
     private final ScheduledExecutorService serviceThreadPool;
 
     public static ThreadPoolService create() {
@@ -23,7 +23,7 @@ public class ThreadPoolService {
         return new ThreadPoolServiceBuilder();
     }
 
-    ThreadPoolService(Consumer<Exception> exceptionHandler, Consumer<String> statisticsHandler, long statisticsOutputDelay) {
+    ThreadPoolService(Consumer<Exception> exceptionHandler, StatisticsHandler statisticsHandler, long statisticsOutputDelay) {
         this.exceptionHandler = exceptionHandler;
         this.statisticsHandler = statisticsHandler;
         this.serviceThreadPool = startStatisticsPrinting(statisticsOutputDelay);
@@ -114,14 +114,8 @@ public class ThreadPoolService {
     }
 
     private void printStatistics(ThreadPoolExecutor threadPoolExecutor) {
-        String name = ((NamedThreadPoolExecutor) threadPoolExecutor).getName();
-        String message = String.format("%-32s   Threads: %3d   Active: %3d   Tasks in Queue: %6d   Completed Tasks: %6d",
-                name,
-                threadPoolExecutor.getPoolSize(),
-                threadPoolExecutor.getActiveCount(),
-                threadPoolExecutor.getQueue().size(),
-                threadPoolExecutor.getCompletedTaskCount());
-        statisticsHandler.accept(message);
+        StatisticsObject statisticsObject = StatisticsObject.of(threadPoolExecutor);
+        statisticsHandler.handle(statisticsObject, statisticsObject.toString());
     }
 
 }
