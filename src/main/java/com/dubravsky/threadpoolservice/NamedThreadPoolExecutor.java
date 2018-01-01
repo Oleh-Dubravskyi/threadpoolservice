@@ -1,6 +1,8 @@
 package com.dubravsky.threadpoolservice;
 
-public interface NamedThreadPoolExecutor {
+import java.util.concurrent.ExecutorService;
+
+public interface NamedThreadPoolExecutor extends ExecutorService {
 
     String getName();
 

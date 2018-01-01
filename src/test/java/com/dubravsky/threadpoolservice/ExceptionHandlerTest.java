@@ -27,7 +27,7 @@ public class ExceptionHandlerTest {
                 .exceptionHandler(exceptionHandler)
                 .build();
         executorService = threadPoolService.newSingleThreadExecutor(ANY_THREAD_POOL_NAME);
-        scheduledExecutorService = threadPoolService.newSingleScheduledThreadPool(ANY_THREAD_POOL_NAME);
+        scheduledExecutorService = threadPoolService.newSingleScheduledThreadPool(SECOND_ANY_THREAD_POOL_NAME);
     }
 
     @After
