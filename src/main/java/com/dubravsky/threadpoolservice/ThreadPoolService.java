@@ -105,7 +105,9 @@ public class ThreadPoolService {
     }
 
     private void printStatistics(ThreadPoolExecutor threadPoolExecutor) {
-        String message = String.format("Total Threads: %d, Active Threads: %d, Queue Size: %d, Completed Tasks: %d",
+        String name = ((NamedThreadPoolExecutor) threadPoolExecutor).getName();
+        String message = String.format("%-32s   Threads: %3d   Active: %3d   Tasks in Queue: %6d   Completed Tasks: %6d",
+                name,
                 threadPoolExecutor.getPoolSize(),
                 threadPoolExecutor.getActiveCount(),
                 threadPoolExecutor.getQueue().size(),
