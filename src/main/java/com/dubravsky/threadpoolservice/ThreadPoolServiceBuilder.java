@@ -7,7 +7,7 @@ public class ThreadPoolServiceBuilder {
     private static final long DEFAULT_STATISTICS_OUTPUT_DELAY = 10_000L;
 
     private Consumer<Exception> exceptionHandler;
-    private Consumer<String> statisticsHandler;
+    private StatisticsHandler statisticsHandler;
     private long statisticsOutputDelay = DEFAULT_STATISTICS_OUTPUT_DELAY;
 
     ThreadPoolServiceBuilder() {
@@ -21,7 +21,7 @@ public class ThreadPoolServiceBuilder {
         return this;
     }
 
-    public ThreadPoolServiceBuilder statisticsHandler(Consumer<String> statisticsHandler) {
+    public ThreadPoolServiceBuilder statisticsHandler(StatisticsHandler statisticsHandler) {
         if (statisticsHandler == null) {
             throw new IllegalArgumentException("StatisticsHandler should not be null");
         }
