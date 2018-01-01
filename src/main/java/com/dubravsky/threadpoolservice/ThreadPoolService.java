@@ -9,6 +9,7 @@ public class ThreadPoolService {
 
     private final List<ExecutorService> executorServices = new ArrayList<>();
     private Consumer<String> statisticsConsumer;
+    private Consumer<Exception> exceptionHandler;
     private ScheduledExecutorService serviceThreadPool;
     private ScheduledFuture<?> printStatisticsFeature;
 
@@ -33,17 +34,22 @@ public class ThreadPoolService {
                 delayMillis, TimeUnit.MILLISECONDS);
     }
 
+    public void setExceptionHandler(Consumer<Exception> exceptionHandler) {
+        this.exceptionHandler = exceptionHandler;
+    }
+
     public int getThreadPoolNumber() {
         return executorServices.size();
     }
 
-    public ExecutorService newSingleThreadScheduledExecutor(String threadName) {
+    public ExecutorService newSingleThreadExecutor(String threadName) {
         return newFixedThreadPool(1, threadName);
     }
 
     public ExecutorService newFixedThreadPool(int nThreads, String threadName) {
         ThreadFactory threadFactory = new NamedThreadFactory(threadName);
-        ExecutorService executorService = Executors.newFixedThreadPool(nThreads, threadFactory);
+        SafeThreadPoolExecutor executorService = new SafeThreadPoolExecutor(nThreads, threadFactory);
+        executorService.setExceptionHandler(exceptionHandler);
         add(executorService);
         return executorService;
     }
@@ -54,7 +60,8 @@ public class ThreadPoolService {
 
     public ScheduledExecutorService newScheduledThreadPool(int corePoolSize, String threadName) {
         ThreadFactory threadFactory = new NamedThreadFactory(threadName);
-        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(corePoolSize, threadFactory);
+        SafeScheduledThreadPoolExecutor scheduledExecutorService = new SafeScheduledThreadPoolExecutor(corePoolSize, threadFactory);
+        scheduledExecutorService.setExceptionHandler(exceptionHandler);
         add(scheduledExecutorService);
         return scheduledExecutorService;
     }

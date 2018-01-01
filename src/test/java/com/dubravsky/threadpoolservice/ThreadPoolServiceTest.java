@@ -16,9 +16,10 @@ import static org.mockito.Mockito.*;
 
 public class ThreadPoolServiceTest {
 
-    private static final long SHORT_DELAY = 30L;
+    static final long SHORT_DELAY = 30L;
+    static final String ANY_THREAD_POOL_NAME = "ThreadPool";
+    static final IllegalArgumentException ANY_EXCEPTION = new IllegalArgumentException("Message");
     private static final long STATISTICS_DELAY = SHORT_DELAY;
-    private static final String ANY_THREAD_POOL_NAME = "ThreadPool";
     private static final String SECOND_ANY_THREAD_POOL_NAME = "SecondThreadPool";
 
     private ThreadPoolService threadPoolService;
@@ -136,7 +137,7 @@ public class ThreadPoolServiceTest {
         threadPoolService = new ThreadPoolService();
         Runnable task = mock(Runnable.class);
 
-        ExecutorService executorService = threadPoolService.newSingleThreadScheduledExecutor(ANY_THREAD_POOL_NAME);
+        ExecutorService executorService = threadPoolService.newSingleThreadExecutor(ANY_THREAD_POOL_NAME);
         executorService.submit(task);
 
         verify(task, timeout(STATISTICS_DELAY).times(1)).run();
