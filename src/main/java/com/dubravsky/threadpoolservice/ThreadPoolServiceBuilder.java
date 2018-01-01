@@ -23,7 +23,7 @@ public class ThreadPoolServiceBuilder {
 
     public ThreadPoolServiceBuilder statisticsHandler(Consumer<String> statisticsHandler) {
         if (statisticsHandler == null) {
-            throw new IllegalArgumentException("To print thread pool statistics consumer should not be null");
+            throw new IllegalArgumentException("StatisticsHandler should not be null");
         }
         this.statisticsHandler = statisticsHandler;
         return this;
