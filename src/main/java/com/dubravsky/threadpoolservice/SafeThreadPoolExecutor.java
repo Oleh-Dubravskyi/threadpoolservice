@@ -6,15 +6,22 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
-class SafeThreadPoolExecutor extends ThreadPoolExecutor {
+class SafeThreadPoolExecutor extends ThreadPoolExecutor implements NamedThreadPoolExecutor {
 
+    private final String name;
     private Consumer<Exception> exceptionHandler;
 
-    public SafeThreadPoolExecutor(int nThreads, ThreadFactory threadFactory) {
+    public SafeThreadPoolExecutor(int nThreads, String threadName) {
         super(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
-                threadFactory);
+                NamedThreadFactory.of(threadName));
+        this.name = threadName;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     public void setExceptionHandler(Consumer<Exception> exceptionHandler) {

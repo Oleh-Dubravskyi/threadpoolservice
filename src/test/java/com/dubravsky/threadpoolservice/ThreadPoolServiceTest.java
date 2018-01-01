@@ -17,10 +17,10 @@ import static org.mockito.Mockito.*;
 public class ThreadPoolServiceTest {
 
     static final long SHORT_DELAY = 30L;
-    static final String ANY_THREAD_POOL_NAME = "ThreadPool";
+    static final String ANY_THREAD_POOL_NAME = "TestThreadPool";
     static final IllegalArgumentException ANY_EXCEPTION = new IllegalArgumentException("Message");
     private static final long STATISTICS_DELAY = SHORT_DELAY;
-    private static final String SECOND_ANY_THREAD_POOL_NAME = "SecondThreadPool";
+    private static final String SECOND_ANY_THREAD_POOL_NAME = "SecondTestThreadPool";
 
     private ThreadPoolService threadPoolService;
 
