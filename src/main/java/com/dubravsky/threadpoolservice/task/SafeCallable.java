@@ -1,9 +1,9 @@
-package com.dubravsky.threadpoolservice;
+package com.dubravsky.threadpoolservice.task;
 
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
-class SafeCallable<T> implements Callable<T> {
+public class SafeCallable<T> implements Callable<T> {
 
     private final Callable<T> task;
     private final Consumer<Exception> exceptionHandler;
