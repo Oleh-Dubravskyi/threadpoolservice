@@ -9,13 +9,6 @@ With the help of ThreadPoolService you can:
  - Shutdown all thread pools in the single-exit point
 
 # Usage
-All code samples that are shown below are using following method:
-
-```java
-private static void log(String message) {
-    System.out.println(LocalDateTime.now() + ": " + message);
-}
-```
 
 An ExecutorService can be created using following example:
 ```java
@@ -24,15 +17,17 @@ ExecutorService executorService = threadPoolService.newSingleThreadExecutor("Tes
 ```
 Actuallly, the only difference between the thread pool created by ThreadPoolService and the one created by Executors class is that ThreadPoolService gives name to all its threads using string argument. To give name of threads created by Executors class you have to create ThreadFactory instance.
 
+## Shutdown all ExecutorService's
 Also, you can shutdown all thread pools created by ThreadPoolService in one place using shutdown() method:
 ```java
 threadPoolService.shutdown();
 ```
 
+## Catch unhandled exceptions
 To catch all unhandled exceptions in any task submitted to ExecutorService you have to specify exception handler:
 ```java
 ThreadPoolService threadPoolService = ThreadPoolService.builder()
-        .exceptionHandler(exception -> log("Handled exception: " + exception))
+        .exceptionHandler(exception -> logger.log("Handled exception: " + exception))
         .build();
 
 ExecutorService executorService = threadPoolService.newSingleThreadExecutor("Test");
@@ -42,19 +37,21 @@ executorService.submit(() -> {
 
 ```
 
+## Gathering Statistics
 Also, you can periodically get the statistics of thread pool usage:
 ```java
 ThreadPoolService threadPoolService = ThreadPoolService.builder()
-        .statisticsHandler((statisticsObject, message) -> log("Statistics: " + message))
+        .statisticsHandler((statisticsObject, message) -> logger.log("Statistics: " + message))
         .statisticsOutputDelay(3_000)
         .build();
 ```
 
+## Full featured example
 And here is the sample of all features of ThreadPoolService:
 ```java
 ThreadPoolService threadPoolService = ThreadPoolService.builder()
-        .exceptionHandler(exception -> log("Handled exception: " + exception))
-        .statisticsHandler((statisticsObject, message) -> log("Statistics: " + message))
+        .exceptionHandler(exception -> logger.log("Handled exception: " + exception))
+        .statisticsHandler((statisticsObject, message) -> logger.log("Statistics: " + message))
         .statisticsOutputDelay(3_000)
         .build();
 
@@ -62,8 +59,8 @@ ExecutorService executorService = threadPoolService.newSingleThreadExecutor("Tes
 ScheduledExecutorService scheduledExecutorService = threadPoolService.newSingleScheduledThreadPool("ScheduledTest");
 
 scheduledExecutorService.schedule(() -> threadPoolService.shutdown(), 10, TimeUnit.SECONDS);
-scheduledExecutorService.scheduleAtFixedRate(() -> log("Periodic task"), 2, 2, TimeUnit.SECONDS);
-executorService.execute(() -> log("Task 01"));
+scheduledExecutorService.scheduleAtFixedRate(() -> logger.log("Periodic task"), 2, 2, TimeUnit.SECONDS);
+executorService.execute(() -> logger.log("Task 01"));
 executorService.submit(() -> {
     throw new IOException("Test Exception");
 });
@@ -87,3 +84,7 @@ The output of this code snippet is following:
 2018-01-01T23:51:59.745: Statistics: Test                               Threads:   1   Active:   0   Tasks in Queue:      0   Completed Tasks:      2
 2018-01-01T23:51:59.746: Statistics: ScheduledTest                      Threads:   1   Active:   0   Tasks in Queue:      2   Completed Tasks:      4
 ```
+
+# License
+
+Proton is released under the MIT License. http://www.opensource.org/licenses/mit-license
