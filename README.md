@@ -4,8 +4,8 @@ ThreadPoolService is a service which simplifies usage of ExecutorServices in Jav
 
 With the help of ThreadPoolService you can:
  - Name a thread in ExecutorService
- - Handle exceptions thrown in any task submitted to ExecutorService
- - Get statistics of usage of the thread pool
+ - Handle exceptions thrown by any task submitted to ExecutorService
+ - Get the statistics of usage of the thread pool
  - Shutdown all thread pools in the single-exit point
 
 # Usage
@@ -86,7 +86,7 @@ The output of this code snippet is following:
 ```
 
 ## Usage with Spring Framework
-If you use Spring Framework it is reasonable to add create some proxy class that will manage shutdown of all thread pools using @Service and @PreDestroy annotations:
+If you use Spring Framework it is reasonable to create some proxy class that will manage shutdown of all thread pools using @Service and @PreDestroy annotations:
 
 ```java
 @Service
