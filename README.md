@@ -85,6 +85,26 @@ The output of this code snippet is following:
 2018-01-01T23:51:59.746: Statistics: ScheduledTest                      Threads:   1   Active:   0   Tasks in Queue:      2   Completed Tasks:      4
 ```
 
+## Usage with Spring Framework
+If you use Spring Framework it is reasonable to add create some proxy class that will manage shutdown of all thread pools using @Service and @PreDestroy annotations:
+
+```java
+@Service
+public class ThreadPoolServiceProxy extends ThreadPoolService {
+
+    ThreadPoolServiceProxy(Consumer<Exception> exceptionHandler, StatisticsHandler statisticsHandler, long statisticsOutputDelay) {
+        super(exceptionHandler, statisticsHandler, statisticsOutputDelay);
+    }
+
+    @Override
+    @PreDestroy
+    public void shutdown() {
+        super.shutdown();
+    }
+
+}
+```
+
 # License
 
 Proton is released under the MIT License. http://www.opensource.org/licenses/mit-license
